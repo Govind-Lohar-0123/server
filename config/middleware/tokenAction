@@ -1,0 +1,10 @@
+
+import jwt from "jsonwebtoken";
+function verifyToken(SECRET_KEY,token){
+    return jwt.verify(token,SECRET_KEY);
+}
+function generateToken(SECRET_KEY,payload){
+    return jwt.sign(payload,SECRET_KEY);
+}
+
+export {verifyToken,generateToken};
