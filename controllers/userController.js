@@ -28,7 +28,7 @@ class UserController {
             else res.status(200).send({ status: false, msg: "Email is aleardy exist..." })
         }
         catch (err) {
-            console.log(err);
+           
             res.status(200).send({ status: false, msg: "Server Error " + err.message });
         }
     }

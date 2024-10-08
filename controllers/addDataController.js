@@ -1,17 +1,17 @@
 import prodModel from "../config/models/productSchema.js"
 
 
-class AddDataController{
-    static addData=async(data)=> {
-       
-        try{
-            const prod=await prodModel.insertMany(data);
-           console.log("Data Successfull Added....")
+class AddDataController {
+    static addData = async (data) => {
+
+        try {
+            const prod = await prodModel.insertMany(data);
+
         }
-        catch(err){
-          console.log("Server Error"+err.message);
+        catch (err) {
+
         }
     }
-  
+
 }
 export default AddDataController;
