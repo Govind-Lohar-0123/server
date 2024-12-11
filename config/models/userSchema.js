@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { verifyToken } from "../middleware/tokenAction";
+
 
 const userSchema = new mongoose.Schema({
     firstname: { type: String, required: true, trim: true, min: 5, max: 20 },
@@ -28,7 +28,7 @@ userSchema.pre("save", async function (next) {
 
 
 userSchema.methods.comparePassword = async function (password) {
-    
+
     try {
         return await bcrypt.compare(password, this.password);
 

@@ -7,7 +7,7 @@ export default class OTPController {
 
     static generateOTP() {
         return randomstring.generate({
-            length: 6,
+            length: 4,
             charset: 'numeric'
         });
     }
@@ -31,7 +31,7 @@ export default class OTPController {
                 message: `<p>Your OTP is: <strong>${otp}</strong></p>`,
             });
 
-            res.status(200).json({ success: true, message: 'OTP sent successfully' });
+            res.status(200).json({ success: true, message: `OTP has been send at ${email}` });
         } catch (error) {
             console.error('Error sending OTP:', error);
             res.status(500).json({ success: false, error: 'Internal server error' });
@@ -41,20 +41,21 @@ export default class OTPController {
     static verifyOTP = async (req, res, next) => {
         try {
             const { email, otp } = req.body;
-            const existingOTP = await otpModel.findOne({ email, otp });
            
-     
-            if (existingOTP!=null && existingOTP.otp == otp) {
+            const existingOTP = await otpModel.findOne({ email, otp });
+
+
+            if (existingOTP != null && existingOTP.otp == otp) {
                 await otpModel.findOneAndDelete({ email });
-               
+                
                 res.status(200).json({ success: true, message: 'OTP verification successful' });
             } else {
-                // OTP is invalid
-                res.status(400).json({ success: false, error: 'Invalid OTP' });
+                
+                res.status(200).json({ success: false, message: 'Invalid OTP' });
             }
         } catch (error) {
             console.error('Error verifying OTP:', error);
-            res.status(500).json({ success: false, error: 'Internal server error' });
+            res.status(500).json({ success: false, message: 'Internal server error' });
         }
     };
 }
