@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, trim: true, min: 5, max: 20 },
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true, trim: true, min: 5, max: 20 },
-    gender: { type: String, default: "male" }
+    
 })
 
 userSchema.pre("save", async function (next) {

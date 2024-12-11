@@ -1,7 +1,8 @@
 import { generateToken } from "../config/middleware/tokenAction";
 import userModel from "../config/models/userSchema.js";
 import bcrypt from "bcrypt";
-
+import {generateHashPass} from "../utils/actions/passHashAction.js"
+import { verifyPassword } from "../utils/actions/passHashAction.js";
 class UserController {
     static register = async (req, res) => {
 
@@ -18,7 +19,7 @@ class UserController {
             let result = await userModel.findOne({ email: user_data.email });
 
             if (result == null) {
-                
+
                 await userModel(user_data).save();
                 let user = await userModel.findOne({ email: user_data.email });
                 let data = { firstname: user.firstname, lastname: user.lastname, phone: user.phone, email: user.email };
@@ -50,7 +51,7 @@ class UserController {
                 let hash_pass = await bcrypt.hash(user_data.password, salt);
                 user_data.password = hash_pass;
             }
-            
+
             await userModel.updateOne({ email: user_data.email }, { ...user_data })
             res.status(200).send({ status: true, msg: "User Update" })
         }
@@ -113,6 +114,72 @@ class UserController {
 
             res.status(500).send({ status: false, msg: "Server Error" + err.message });
         }
+    }
+    static forgetPassword = async (req, res) => {
+        let user_data = req.body.user_data;
+        let { email, newPassword } = req.body.user_data;
+      
+        for (let key in req.body.user_data) {
+            if (user_data[key] == "" || user_data[key] == undefined) {
+                res.status(201).send({ msg: "Please Fill All Field" });
+                return;
+            }
+        }
+
+        try {
+            let user = await userModel.findOne({ email: email });
+            if (user == undefined || user == null) {
+                res.status(201).send({ msg: "Email is Invalid..." });
+                return;
+            }
+
+            let newHashPass = await generateHashPass(newPassword);
+
+            await userModel.updateOne({ email: email }, { password: newHashPass });
+
+            res.status(200).send({ msg: "User Password Changed..." });
+
+        }
+        catch (err) {
+            console.log(err.message)
+            res.status(500).send({ msg: "Server Error " + err });
+        }
+
+    }
+    static changePassword = async (req, res) => {
+        let user_data = req.body.user_data;
+        let { email, newPassword, oldPassword } = req.body.user_data;
+        
+        for (let key in user_data) {
+            if (user_data[key] == "" || user_data[key] == undefined) {
+                res.status(201).send({ msg: "Please Fill All Field" });
+                return;
+            }
+        }
+
+
+        try {
+            let user = await userModel.findOne({ email: email });
+            let hashPass = user.password;
+            let isMatchPass = await verifyPassword(oldPassword, hashPass);
+
+            if (isMatchPass == false) {
+                res.status(201).send({ msg: "Old Password is Wrong..." });
+            }
+            else {
+                let newHashPass = await generateHashPass(newPassword);
+
+                await userModel.updateOne({ email: email }, { password: newHashPass });
+
+                res.status(200).send({ msg: "User Password Changed..." });
+            }
+
+
+        }
+        catch (err) {
+            res.status(500).send({ msg: "Server Error " + err });
+        }
+
     }
 }
 
