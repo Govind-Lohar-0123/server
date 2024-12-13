@@ -34,7 +34,7 @@ class CartController {
     }
     static removeFromCart = async (req, res) => {
         const { prod_id } = req.params;
-        console.log(prod_id);
+        
         try {
             const result = await cartModel.deleteOne({ _id: prod_id });
             res.status(200).send({ status: true, msg: "Successfull removed..." });
